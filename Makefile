@@ -3,12 +3,12 @@ BUILD_DIR = output
 NWLINK = npx --yes -- nwlink@0.0.19
 
 CFLAGS = -std=c99 $(shell $(NWLINK) eadk-cflags-device) -Os -Wall -fdata-sections -ffunction-sections
-LDFLAGS = -Wl,--relocatable -nostartfiles --specs=nano.specs -Wl,-e,main -Wl,-u,eadk_app_name -Wl,-u,eadk_app_icon -Wl,-u,eadk_api_level -Wl,--gc-sections -lm
+LDFLAGS = -Wl,--relocatable -nostartfiles --specs=nano.specs -Wl,-e,main -Wl,-u,eadk_app_name -Wl,-u,eadk_app_icon -Wl,-u,eadk_api_level -Wl,--gc-sections
 
 all: $(BUILD_DIR)/NumLLM.nwa
 
 $(BUILD_DIR)/NumLLM.nwa: $(BUILD_DIR)/main.o $(BUILD_DIR)/icon.o
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -lm -o $@
 	$(NWLINK) nwa-bin $@ $(BUILD_DIR)/NumLLM.bin
 	@ls -lh $@
 
