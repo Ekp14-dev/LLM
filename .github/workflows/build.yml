@@ -1,0 +1,30 @@
+name: Build NumLLM (.nwa)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer toolchain ARM + Python PyTorch
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Entrainer et quantifier le Mini-LLM (~3.4 Mo INT8) + Compiler NumLLM.nwa
+        run: |
+          DIR=$(find . -maxdepth 3 -type f -name "Makefile" -exec dirname {} \; | head -n 1)
+          cd "$DIR"
+          python3 tools/train_and_export.py
+          make
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          cp output/NumLLM.nwa "$GITHUB_WORKSPACE/out/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NumLLM-nwa
+          path: out/NumLLM.nwa
